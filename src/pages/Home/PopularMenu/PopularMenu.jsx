@@ -6,6 +6,7 @@ const PopularMenu = () => {
     const [menu] = useMenu();
     const popular = menu.filter(item => item.category === 'popular')
 
+    
     // const [menu, setMenu] = useState([]);
 
     // useEffect(() => {
@@ -16,6 +17,7 @@ const PopularMenu = () => {
     //         setMenu(popularItems);
     //     })
     // }, [])
+
 
     return (
         <section className="md:my-10 my-7 max-w-screen-xl mx-auto">
