@@ -31,19 +31,19 @@ const Menu = () => {
                 </div>
 
                 <div className="my-10">
-                    <MenuCategory items={dessert} title="DESSERT" coverImg={dessertImg} btnName=""></MenuCategory>
+                    <MenuCategory items={dessert} title="dessert" coverImg={dessertImg} btnName=""></MenuCategory>
                 </div>
 
                 <div>
-                    <MenuCategory items={pizza} title="PIZZA" coverImg={pizzaImg}></MenuCategory>
+                    <MenuCategory items={pizza} title="pizza" coverImg={pizzaImg}></MenuCategory>
                 </div>
 
                 <div>
-                    <MenuCategory items={salad} title="SALAD" coverImg={saladImg}></MenuCategory>
+                    <MenuCategory items={salad} title="salad" coverImg={saladImg}></MenuCategory>
                 </div>
 
                 <div>
-                    <MenuCategory items={soup} title="SOUP" coverImg={soupImg}></MenuCategory>
+                    <MenuCategory items={soup} title="soup" coverImg={soupImg}></MenuCategory>
                 </div>
             </div>
         </div>
