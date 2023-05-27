@@ -1,5 +1,5 @@
 import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaTwitter } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import './Login.css'
 import Swal from 'sweetalert2'
 import loginImg from '../../../src/assets/others/authentication1.png'
@@ -13,6 +13,10 @@ const Login = () => {
     const captchaRef = useRef(null);
     const [disabled, setDisabled] = useState(true);
     const {logIn, GoogleSignIn} = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+    
+    const from = location.state?.from?.pathname || '/';
 
     const handleLogin = event => {
         event.preventDefault();
@@ -33,6 +37,7 @@ const Login = () => {
                   popup: 'animate__animated animate__fadeOutUp'
                 }
               })
+              navigate(from, {replace: true})
         })
         .catch(error => console.log(error.message))
         
@@ -43,6 +48,7 @@ const Login = () => {
         GoogleSignIn()
         .then(result => {
             console.log(result);
+            navigate(from, {replace: true})
         })
         .catch(error => console.log(error))
     }
