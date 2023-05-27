@@ -2,8 +2,13 @@ import { FaFacebook, FaGoogle, FaLock, FaTwitter, FaUser } from "react-icons/fa"
 import { Link } from "react-router-dom";
 import './Login.css'
 import loginImg from '../../../src/assets/others/authentication1.png'
+import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha} from 'react-simple-captcha';
+import { useEffect, useRef, useState } from "react";
+
 
 const Login = () => {
+    const captchaRef = useRef(null);
+    const [disabled, setDisabled] = useState(true);
 
     const handleLogin = event => {
         event.preventDefault();
@@ -15,10 +20,26 @@ const Login = () => {
         
     }
 
+
+    useEffect(()=> {
+        loadCaptchaEnginge(6); 
+    }, [])
+
+
+    const handleValidateCaptcha = () => {
+        const user_captcha_value = captchaRef.current.value;
+        if(validateCaptcha(user_captcha_value)){
+            setDisabled(false);
+        } 
+        else{
+            setDisabled(true);
+        }
+    }
+
     return (
-        <div className="login-bg md:h-[100vh]">
-        <div className="login-subBg md:w-[70%] w-11/12 mx-auto md:py-0 md:pt-10 rounded-2xl py-7">
-            <div data-aos="zoom-in-up" className="flex  shadow-2xl  flex-col md:flex-row gap-10 md:gap-3 w-full px-3 md:py-24 py-10 items-center justify-center ">
+        <div className="login-bg md:pt-16 md:h-[100vh]">
+        <div className="login-subBg md:w-[70%] w-11/12 mx-auto ">
+            <div data-aos="zoom-in-up" className="flex  shadow-2xl  flex-col md:flex-row gap-10 md:gap-3 w-full px-3 pt-10 py-5 items-center justify-center ">
                 <div className="w-full   px-4 grid items-center justify-center">
                     <img
                     className=""
@@ -65,6 +86,27 @@ const Login = () => {
                         />
                         </div>
                     </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">
+                            <LoadCanvasTemplate />
+                        </label>
+                        
+                        <div className="flex items-center">
+                        <span className="absolute pl-3">
+                            <FaLock />
+                        </span>
+                        <input
+                            ref={captchaRef}
+                            className="appearance-none border rounded pl-10 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="captcha"
+                            type="text"
+                            name='captcha'
+                            placeholder="type the captcha above"
+                        />
+                        <button onClick={handleValidateCaptcha} className="btn btn-outline btn-xs ml-1">Click for Validate</button>
+                        </div>
+                    </div>
                     <div className="mb-4">
                         <label htmlFor="remember" className="flex items-center">
                         <input
@@ -80,6 +122,7 @@ const Login = () => {
                     </div>
                     <div>
                         <button
+                        disabled={disabled}
                         className="bg-[#D1A054] hover:bg-[#e5a648] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                         type="submit"
                         >
