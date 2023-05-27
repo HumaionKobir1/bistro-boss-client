@@ -1,9 +1,13 @@
 import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaTwitter, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import loginImg from '../../../src/assets/others/authentication1.png'
+import { useContext } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
+import { Helmet } from "react-helmet";
 
 
 const SignUp = () => {
+    const {createUser} = useContext(AuthContext);
 
     const handleSignUp = event => {
         event.preventDefault();
@@ -13,10 +17,21 @@ const SignUp = () => {
         const password = form.password.value;
         console.log(name, email, password);
 
+        createUser(email, password)
+        .then(result => {
+            const user = result.user;
+            console.log(user);
+        })
+        .catch(error => console.log(error.message))
+
     }
 
     return (
         <div className="login-bg md:pt-16 md:h-[100vh]">
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Bistro Boss || SignUp</title>
+            </Helmet>
         <div className="login-subBg md:w-[70%] w-11/12 mx-auto ">
             <div data-aos="zoom-in-up" className="flex  shadow-2xl  flex-col md:flex-row-reverse gap-10 md:gap-3 w-full px-3 pt-10 py-5 items-center justify-center ">
                 <div className="w-full   px-4 grid items-center justify-center">

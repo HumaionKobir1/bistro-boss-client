@@ -1,14 +1,18 @@
-import { FaFacebook, FaGoogle, FaLock, FaTwitter, FaUser } from "react-icons/fa";
+import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaTwitter } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import './Login.css'
+import Swal from 'sweetalert2'
 import loginImg from '../../../src/assets/others/authentication1.png'
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha} from 'react-simple-captcha';
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
+import { Helmet } from "react-helmet";
 
 
 const Login = () => {
     const captchaRef = useRef(null);
     const [disabled, setDisabled] = useState(true);
+    const {logIn, GoogleSignIn} = useContext(AuthContext);
 
     const handleLogin = event => {
         event.preventDefault();
@@ -16,8 +20,31 @@ const Login = () => {
         const email = form.email.value;
         const password = form.password.value;
         console.log(email, password);
-
+        logIn(email, password)
+        .then(result => {
+            const loggedUser = result.user;
+            console.log(loggedUser);
+            Swal.fire({
+                title: 'User Login Successful',
+                showClass: {
+                  popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                  popup: 'animate__animated animate__fadeOutUp'
+                }
+              })
+        })
+        .catch(error => console.log(error.message))
         
+    }
+
+
+    const handleGoogleLogin = () => {
+        GoogleSignIn()
+        .then(result => {
+            console.log(result);
+        })
+        .catch(error => console.log(error))
     }
 
 
@@ -26,8 +53,8 @@ const Login = () => {
     }, [])
 
 
-    const handleValidateCaptcha = () => {
-        const user_captcha_value = captchaRef.current.value;
+    const handleValidateCaptcha = (e) => {
+        const user_captcha_value = e.target.value;
         if(validateCaptcha(user_captcha_value)){
             setDisabled(false);
         } 
@@ -38,6 +65,10 @@ const Login = () => {
 
     return (
         <div className="login-bg md:pt-16 md:h-[100vh]">
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Bistro Boss || LogIn</title>
+            </Helmet>
         <div className="login-subBg md:w-[70%] w-11/12 mx-auto ">
             <div data-aos="zoom-in-up" className="flex  shadow-2xl  flex-col md:flex-row gap-10 md:gap-3 w-full px-3 pt-10 py-5 items-center justify-center ">
                 <div className="w-full   px-4 grid items-center justify-center">
@@ -57,7 +88,7 @@ const Login = () => {
 
                         <div className="flex items-center">
                         <span className="absolute  pl-3">
-                            <FaUser />
+                            <FaMailBulk />
                         </span>
                         <input
                             className="appearance-none border rounded pl-10 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -97,6 +128,7 @@ const Login = () => {
                             <FaLock />
                         </span>
                         <input
+                            onBlur={handleValidateCaptcha} 
                             ref={captchaRef}
                             className="appearance-none border rounded pl-10 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="captcha"
@@ -104,7 +136,6 @@ const Login = () => {
                             name='captcha'
                             placeholder="type the captcha above"
                         />
-                        <button onClick={handleValidateCaptcha} className="btn btn-outline btn-xs ml-1">Click for Validate</button>
                         </div>
                     </div>
                     <div className="mb-4">
@@ -135,7 +166,7 @@ const Login = () => {
                         <p className="my-3 text-center">Or sign in with</p>
                         <div className='flex gap-5 justify-center'>
                             <button><FaFacebook className='w-6 h-6'></FaFacebook></button>
-                            <button onClick={''}><FaGoogle className='w-6 h-6'></FaGoogle></button>
+                            <button onClick={handleGoogleLogin}><FaGoogle className='w-6 h-6'></FaGoogle></button>
                             <button><FaTwitter className='w-6 h-6'></FaTwitter></button>
                         </div>
                     </div>
