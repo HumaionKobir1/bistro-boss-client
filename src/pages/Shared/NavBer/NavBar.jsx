@@ -18,6 +18,7 @@ const NavBar = () => {
         <li><Link to='/secret'>secret</Link></li>
         {
             user ? <>
+                <span><img className="w-10 h-10 rounded-full" src={user?.photoUrl} title={user?.displayName} alt="" /></span>
                  <button onClick={handleLogOut} className="btn btn-outline">LogOut</button>
 
             </> : <>

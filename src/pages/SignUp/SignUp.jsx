@@ -1,29 +1,57 @@
-import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaTwitter, FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaPhotoVideo, FaTwitter, FaUser } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import loginImg from '../../../src/assets/others/authentication1.png'
 import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { Helmet } from "react-helmet";
+import Swal from "sweetalert2";
 
 
 const SignUp = () => {
-    const {createUser} = useContext(AuthContext);
+    const {createUser, updateUserProfile, GoogleSignIn} = useContext(AuthContext);
+    const navigate = useNavigate();
+
+
 
     const handleSignUp = event => {
         event.preventDefault();
         const form = event.target;
         const name = form.userName.value;
+        const photo = form.photo.value;
         const email = form.email.value;
         const password = form.password.value;
-        console.log(name, email, password);
+        console.log(name, photo, email, password);
 
         createUser(email, password)
         .then(result => {
             const user = result.user;
             console.log(user);
+            updateUserProfile(name, photo)
+            .then(()=> {
+                console.log('user profile info update')
+                Swal.fire({
+                    title: 'User Create Successful',
+                    showClass: {
+                      popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                      popup: 'animate__animated animate__fadeOutUp'
+                    }
+                  })
+            })
+            .catch(error => console.log(error));
         })
         .catch(error => console.log(error.message))
 
+    }
+
+    const handleGoogleLogin = () => {
+        GoogleSignIn()
+        .then(result => {
+            console.log(result);
+            navigate('/')
+        })
+        .catch(error => console.log(error))
     }
 
     return (
@@ -59,6 +87,25 @@ const SignUp = () => {
                             type="text"
                             name='userName' 
                             placeholder="Enter your name"
+                        />
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="Photo" className="block text-gray-700 font-bold mb-2">
+                        Photo
+                        </label>
+
+                        <div className="flex items-center">
+                        <span className="absolute  pl-3">
+                            <FaPhotoVideo />
+                        </span>
+                        <input
+                            className="appearance-none border rounded pl-10 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="photo"
+                            type="text"
+                            name='photo' 
+                            placeholder="Enter your photoUrl"
                         />
                         </div>
                     </div>
@@ -128,7 +175,7 @@ const SignUp = () => {
                         <p className="my-3 text-center">Or sign Up with</p>
                         <div className='flex gap-5 justify-center'>
                             <button><FaFacebook className='w-6 h-6'></FaFacebook></button>
-                            <button onClick={''}><FaGoogle className='w-6 h-6'></FaGoogle></button>
+                            <button onClick={handleGoogleLogin}><FaGoogle className='w-6 h-6'></FaGoogle></button>
                             <button><FaTwitter className='w-6 h-6'></FaTwitter></button>
                         </div>
                     </div>
