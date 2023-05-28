@@ -20,7 +20,7 @@ const NavBar = () => {
         <li><Link to='/order/salad'>Order Food</Link></li>
         <li><Link to='/secret'>secret</Link></li>
         <li>
-            <Link to='/'>
+            <Link to='/dashboard/myCart'>
                 <button className="btn gap-2">
                     <FaShoppingCart className="w-4 h-4"></FaShoppingCart>
                     <div className="badge badge-secondary">+{cart?.length || 0}</div>
