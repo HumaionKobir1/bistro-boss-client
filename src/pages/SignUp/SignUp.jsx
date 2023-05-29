@@ -1,5 +1,5 @@
 import { FaFacebook, FaGoogle, FaLock, FaMailBulk, FaPhotoVideo, FaTwitter, FaUser } from "react-icons/fa";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 import loginImg from '../../../src/assets/others/authentication1.png'
 import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
@@ -26,18 +26,36 @@ const SignUp = () => {
         .then(result => {
             const user = result.user;
             console.log(user);
+
             updateUserProfile(name, photo)
             .then(()=> {
-                console.log('user profile info update')
-                Swal.fire({
-                    title: 'User Create Successful',
-                    showClass: {
-                      popup: 'animate__animated animate__fadeInDown'
+
+                const saveUser = {name: name,  email: email};
+                
+                fetch("http://localhost:5000/users", {
+                    method: 'POST',
+                    headers: {
+                        'content-type' : 'application/json'
                     },
-                    hideClass: {
-                      popup: 'animate__animated animate__fadeOutUp'
+                    body: JSON.stringify(saveUser)
+                })
+
+                .then(res => res.json())
+                .then(data => {
+                    if(data.insertedId){
+                        Swal.fire({
+                            title: 'User Create Successful',
+                            showClass: {
+                              popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                              popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        })
+                        navigate('/');
                     }
-                  })
+                })
+
             })
             .catch(error => console.log(error));
         })
