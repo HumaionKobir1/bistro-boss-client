@@ -28,6 +28,7 @@ const Login = () => {
         .then(result => {
             const loggedUser = result.user;
             console.log(loggedUser);
+
             Swal.fire({
                 title: 'User Login Successful',
                 showClass: {
@@ -47,8 +48,25 @@ const Login = () => {
     const handleGoogleLogin = () => {
         GoogleSignIn()
         .then(result => {
-            console.log(result);
-            navigate(from, {replace: true})
+            const loggedInUser = result.user;
+            console.log(loggedInUser);
+
+            const saveUser = {name: loggedInUser.displayName,  email: loggedInUser.email};
+                
+                fetch("http://localhost:5000/users", {
+                    method: 'POST',
+                    headers: {
+                        'content-type' : 'application/json'
+                    },
+                    body: JSON.stringify(saveUser)
+                })
+
+                .then(res => res.json())
+                .then(() => {
+                    navigate(from, {replace: true})
+
+                })
+
         })
         .catch(error => console.log(error))
     }
