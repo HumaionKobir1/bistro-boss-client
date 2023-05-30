@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 const MyCart = () => {
     const [cart, refetch] = useCart();
-    const total = cart.reduce((sum, item)=> item.price + sum, 0);
+    const total = cart.reduce((sum, item) => item.price + sum, 0);
 
     const handleDelete = (item) => {
         Swal.fire({
@@ -38,13 +38,13 @@ const MyCart = () => {
 })
     }
     return (
-        <div className="w-10/12">
+        <div className="w-full max-h-full md:p-16">
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>Bistro Boss || My Cart</title>
             </Helmet>
             <div className="bg-white w-full p-8">
-                <div className="uppercase flex justify-evenly md:gap-32 gap-4 py-3">
+                <div className="uppercase flex justify-evenly ">
                     <h3 className="md:text-2xl ">Total Items: {cart.length}</h3>
                     <h3 className="md:text-2xl text-lg">Total Price: ${total}</h3>
                     <button className="btn btn-sm border-none bg-[#D1A054]">pay</button>

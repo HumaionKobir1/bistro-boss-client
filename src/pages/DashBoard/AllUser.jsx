@@ -2,25 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { FaTrashAlt, FaUserShield } from "react-icons/fa";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const AllUser = () => {
-    const {data: users = [], refetch} = useQuery(['users'], async() => {
-        const res = await fetch('http://localhost:5000/users')
-        return res.json();
+    
+
+    const [axiosSecure] = useAxiosSecure();
+    const { data: users = [], refetch } = useQuery(['users'], async () => {
+        const res = await axiosSecure.get('/users')
+        return res.data;
     })
 
-    const handleMakeAdmin = (user) => {
-        fetch( `http://localhost:5000/users/admin/${user._id}` , {
+    const handleMakeAdmin = user =>{
+        fetch(`http://localhost:5000/users/admin/${user._id}`, {
             method: 'PATCH'
         })
         .then(res => res.json())
         .then(data => {
+            console.log(data)
             if(data.modifiedCount){
                 refetch();
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: `${user.name} is an Admin now!`,
+                    title: `${user.name} is an Admin Now!`,
                     showConfirmButton: false,
                     timer: 1500
                   })
@@ -29,10 +34,11 @@ const AllUser = () => {
     }
 
     const handleDelete = user => {
-        console.log(user);
+        console.log(user)
     }
+
     return (
-        <div className="w-full">
+        <div className="w-full max-h-full md:p-16">
             <Helmet>
                 <title>Bistro Boss | All users</title>
             </Helmet>
