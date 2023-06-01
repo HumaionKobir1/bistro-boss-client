@@ -2,7 +2,6 @@ import SectionTitle from "../../components/SectionTitle/SectionTitle";
 const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
 
 const AddItem = () => {
-    const img_hosting_url = `https://api.imgbb.com/1/upload?expiration=600&key=${img_hosting_token}`
 
     const handleAddItem = event => {
         event.preventDefault();
@@ -11,22 +10,27 @@ const AddItem = () => {
         const price = form.price.value;
         const category = form.category.value;
         const details = form.details.value;
-        const image = form.img.value;
 
+        // Image Upload
+        const image = form.img.files[0]
         const formData = new FormData();
-        formData.append(image, image)
+        formData.append('image', image);
+        const url = `https://api.imgbb.com/1/upload?key=${img_hosting_token}`
 
-        fetch(img_hosting_url, {
+        fetch(url, {
             method: 'POST',
             body: formData
         })
         .then(res => res.json())
         .then(imgResponse => {
-            console.log(imgResponse);
+            if(imgResponse.success){
+                const imgURL = imgResponse.data.display_url;
+                const newItem = {name, price: parseFloat(price), category, details, image: imgURL}
+                console.log(newItem);
+            }
         })
 
-        const newToy = {category, name, price,  details, image};
-        console.log(newToy);
+        
     }
     return (
         <div className="w-full">
