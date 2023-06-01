@@ -1,18 +1,31 @@
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
+const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
 
 const AddItem = () => {
-
+    const img_hosting_url = `https://api.imgbb.com/1/upload?expiration=600&key=${img_hosting_token}`
 
     const handleAddItem = event => {
         event.preventDefault();
-
         const form = event.target;
         const name = form.name.value;
         const price = form.price.value;
         const category = form.category.value;
         const details = form.details.value;
+        const image = form.img.value;
 
-        const newToy = {category, name, price,  details};
+        const formData = new FormData();
+        formData.append(image, image)
+
+        fetch(img_hosting_url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(imgResponse => {
+            console.log(imgResponse);
+        })
+
+        const newToy = {category, name, price,  details, image};
         console.log(newToy);
     }
     return (
@@ -81,6 +94,19 @@ const AddItem = () => {
                         name="details"
                         required
                     ></textarea>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="file" className="block font-medium">
+                        Choose File:
+                        </label>
+                        <input
+                        type="file"
+                        id="file"
+                        name="img"
+                        className="border border-gray-300 p-2 w-full"
+                        onChange={' '}
+                        />
                     </div>
                     <button type="submit" className="w-full bg-[#D1A054] hover:bg-[rgb(231,161,144)] text-gray-800 font-bold py-2 px-4 rounded">
                     Add Item
