@@ -1,7 +1,9 @@
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
 
 const AddItem = () => {
+    const [axiosSecure] = useAxiosSecure();
 
     const handleAddItem = event => {
         event.preventDefault();
@@ -26,7 +28,10 @@ const AddItem = () => {
             if(imgResponse.success){
                 const imgURL = imgResponse.data.display_url;
                 const newItem = {name, price: parseFloat(price), category, details, image: imgURL}
-                console.log(newItem);
+                axiosSecure.post('/menu', newItem)
+                .then(data => {
+                    console.log('after posting new menu item', data.data);
+                })
             }
         })
 

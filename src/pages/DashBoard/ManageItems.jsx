@@ -1,11 +1,11 @@
-import { Helmet } from "react-helmet";
-import useCart from "../../hooks/useCart";
-import { FaTrashAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
+import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import useMenu from "../../hooks/useMenu";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const MyCart = () => {
-    const [cart, refetch] = useCart();
-    const total = cart.reduce((sum, item) => item.price + sum, 0);
+const ManageItems = () => {
+    const [menu] = useMenu();
+
 
     const handleDelete = (item) => {
         Swal.fire({
@@ -25,7 +25,6 @@ const MyCart = () => {
                 .then(res => res.json())
                 .then(data => {
                     if(data.deletedCount > 0){
-                        refetch()
                         Swal.fire(
                             'Deleted!',
                             'Your file has been deleted.',
@@ -36,19 +35,16 @@ const MyCart = () => {
                 
         }
     })
-    }
+}
     return (
         <div className="w-full max-h-full md:p-16">
-            <Helmet>
-                <meta charSet="utf-8" />
-                <title>Bistro Boss || My Cart</title>
-            </Helmet>
-            <div className="bg-white w-full p-8">
-                <div className="uppercase flex justify-between ">
-                    <h3 className="md:text-2xl ">Total Items: {cart.length}</h3>
-                    <h3 className="md:text-2xl text-lg">Total Price: ${total}</h3>
-                    <button className="btn btn-sm border-none bg-[#D1A054]">pay</button>
-                </div>
+            <SectionTitle
+                subHeading={"Hurry up!"}
+                heading={"Manage All Items"}
+            ></SectionTitle>
+
+            <div className="bg-white w-full">
+                
                 <div className="overflow-x-auto w-full">
                     <table className="table w-full">
                         {/* head */}
@@ -62,12 +58,13 @@ const MyCart = () => {
                             <th>Food</th>
                             <th>Item Name</th>
                             <th>Price</th>
+                            <th>Update</th>
                             <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         {
-                            cart.map((item, index) => <tr
+                            menu.map((item, index) => <tr
                                 key={item._id}
                             >
                                 <td>
@@ -87,6 +84,10 @@ const MyCart = () => {
                                 <td className="text-start">
                                     ${item.price}
                                 </td>
+
+                                <td>
+                                    <button><FaEdit></FaEdit> </button>
+                                </td>
                                 <th>
                                 <button onClick={()=>handleDelete(item)} className="btn btn-ghost btn-sm bg-red-600 text-white"><FaTrashAlt></FaTrashAlt></button>
                                 </th>
@@ -101,8 +102,9 @@ const MyCart = () => {
                     </table>
                 </div>
             </div>
+
         </div>
     );
 };
 
-export default MyCart;
+export default ManageItems;
