@@ -2,9 +2,11 @@ import Swal from "sweetalert2";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import useMenu from "../../hooks/useMenu";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const ManageItems = () => {
-    const [menu] = useMenu();
+    const [menu, , refetch] = useMenu();
+    const [axiosSecure] = useAxiosSecure();
 
 
     const handleDelete = (item) => {
@@ -18,13 +20,10 @@ const ManageItems = () => {
             confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/carts/${item._id}`, {
-                    method: 'DELETE',
-                    
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.deletedCount > 0){
+                axiosSecure.delete(`/menu/${item._id}`)
+                .then(res => {
+                    if(res.data.deletedCount > 0){
+                        refetch();
                         Swal.fire(
                             'Deleted!',
                             'Your file has been deleted.',
@@ -32,6 +31,7 @@ const ManageItems = () => {
                             ) 
                     }
                 })
+                
                 
         }
     })
@@ -43,7 +43,7 @@ const ManageItems = () => {
                 heading={"Manage All Items"}
             ></SectionTitle>
 
-            <div className="bg-white w-full">
+            <div className="bg-white w-full p-5">
                 
                 <div className="overflow-x-auto w-full">
                     <table className="table w-full">

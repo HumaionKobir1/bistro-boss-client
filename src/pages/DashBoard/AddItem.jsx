@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
@@ -12,7 +13,6 @@ const AddItem = () => {
         const price = form.price.value;
         const category = form.category.value;
         const details = form.details.value;
-
         // Image Upload
         const image = form.img.files[0]
         const formData = new FormData();
@@ -23,14 +23,23 @@ const AddItem = () => {
             method: 'POST',
             body: formData
         })
+
         .then(res => res.json())
         .then(imgResponse => {
             if(imgResponse.success){
                 const imgURL = imgResponse.data.display_url;
                 const newItem = {name, price: parseFloat(price), category, details, image: imgURL}
-                axiosSecure.post('/menu', newItem)
+                axiosSecure.post('menu', newItem)
                 .then(data => {
-                    console.log('after posting new menu item', data.data);
+                    if(data.data.insertedId){
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Item added successfully',
+                            showConfirmButton: false,
+                            timer: 1500
+                          })
+                    }
                 })
             }
         })
