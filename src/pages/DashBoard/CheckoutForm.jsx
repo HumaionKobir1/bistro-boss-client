@@ -1,10 +1,24 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useEffect } from "react";
+import useAuth from "../../hooks/useAuth";
 
-const CheckoutForm = () => {
+const CheckoutForm = ({price}) => {
+    const {user} = useAuth();
     const stripe = useStripe();
     const elements = useElements();
     const [cardError, setCardError] = useState('');
+    const [axiosSecure] = useAxiosSecure();
+    const [clientSecret, setClientSecret] = useState('');
+
+    useEffect(() => {
+        axiosSecure.post('/create-payment-intent', {price})
+        .then(res => {
+            console.log(res.data.clientSecret)
+            setClientSecret(res.data.clientSecret);
+        })
+    }, [axiosSecure, price])
 
     const handleSubmit = async(event) => {
         event.preventDefault();
@@ -31,6 +45,25 @@ const CheckoutForm = () => {
             console.log('payment method', paymentMethod);
         }
 
+        const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
+            clientSecret,
+            {
+              payment_method: {
+                card: card,
+                billing_details: {
+                  email: user?.email || 'unknown',
+                  name: user?.displayName || 'anonymous'
+                },
+              },
+            },
+          );
+
+          if(confirmError){
+            console.log(confirmError);
+          }
+
+          console.log(paymentIntent);
+
     }
     return (
         <div>
@@ -51,7 +84,7 @@ const CheckoutForm = () => {
                 },
                 }}
             />
-            <button className="p-2 rounded-lg flex justify-center mt-5 btn-primary w-72 mx-auto" type="submit" disabled={!stripe}>
+            <button className="p-2 rounded-lg flex justify-center mt-5 btn-primary w-72 mx-auto" type="submit" disabled={!stripe || !clientSecret}>
                 Pay
             </button>
             </form>
