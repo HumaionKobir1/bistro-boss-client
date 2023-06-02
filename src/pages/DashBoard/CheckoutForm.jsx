@@ -12,6 +12,11 @@ const CheckoutForm = () => {
             return;
         }
 
+        const card = elements.getElement(CardElement);
+        if(card === null){
+            return;
+        }
+
     }
     return (
         <div>
