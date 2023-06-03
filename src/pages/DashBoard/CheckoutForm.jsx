@@ -11,6 +11,8 @@ const CheckoutForm = ({price}) => {
     const [cardError, setCardError] = useState('');
     const [axiosSecure] = useAxiosSecure();
     const [clientSecret, setClientSecret] = useState('');
+    const [processing, setProcessing] = useState(false);
+    const [transactionId, setTransactionId] = useState('');
 
     useEffect(() => {
         axiosSecure.post('/create-payment-intent', {price})
@@ -18,7 +20,7 @@ const CheckoutForm = ({price}) => {
             console.log(res.data.clientSecret)
             setClientSecret(res.data.clientSecret);
         })
-    }, [axiosSecure, price])
+    }, [])
 
     const handleSubmit = async(event) => {
         event.preventDefault();
@@ -32,18 +34,20 @@ const CheckoutForm = ({price}) => {
             return;
         }
 
-        const {error, paymentMethod} = await stripe.createPaymentMethod({
+        const {error} = await stripe.createPaymentMethod({
             type: 'card',
-            card
+            card,
         })
+
         if(error){
             console.log('error', error);
             setCardError(error.message);
         }
         else{
-            setCardError(' ');
-            console.log('payment method', paymentMethod);
+            setCardError('');
         }
+
+        setProcessing(true);
 
         const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
             clientSecret,
@@ -62,7 +66,12 @@ const CheckoutForm = ({price}) => {
             console.log(confirmError);
           }
 
-          console.log(paymentIntent);
+          setProcessing(false);
+          if(paymentIntent.status === 'succeeded'){
+            setTransactionId(paymentIntent.id)
+
+
+          }
 
     }
     return (
@@ -84,12 +93,15 @@ const CheckoutForm = ({price}) => {
                 },
                 }}
             />
-            <button className="p-2 rounded-lg flex justify-center mt-5 btn-primary w-72 mx-auto" type="submit" disabled={!stripe || !clientSecret}>
+            <button className="btn p-2 rounded-lg flex justify-center mt-5 btn-primary w-72 mx-auto" type="submit" disabled={!stripe || !clientSecret || processing}>
                 Pay
             </button>
             </form>
             {
                 cardError && <p className="text-red-500 text-center mt-3">{cardError}</p>
+            }
+            {
+                transactionId && <p className="text-green-500 text-center mt-3">Transaction complete with TransactionId: {transactionId}</p>
             }
         </div>
     );
