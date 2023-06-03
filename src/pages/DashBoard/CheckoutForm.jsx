@@ -6,7 +6,7 @@ import useAuth from "../../hooks/useAuth";
 
 const CheckoutForm = ({price, cart}) => {
     const {user} = useAuth();
-    const stripe = useStripe();
+    const stripe = useStripe(process.meta.env.VITE_Payment_Gateway_pk);
     const elements = useElements();
     const [cardError, setCardError] = useState('');
     const [axiosSecure] = useAxiosSecure();
@@ -15,79 +15,84 @@ const CheckoutForm = ({price, cart}) => {
     const [transactionId, setTransactionId] = useState('');
 
     useEffect(() => {
-        axiosSecure.post('/create-payment-intent', {price})
-        .then(res => {
-            console.log(res.data.clientSecret)
-            setClientSecret(res.data.clientSecret);
-        })
-    }, [])
+        if (price > 0) {
+            axiosSecure.post('/create-payment-intent', { price })
+                .then(res => {
+                    console.log(res.data.clientSecret)
+                    setClientSecret(res.data.clientSecret);
+                })
+        }
+    }, [price, axiosSecure])
 
-    const handleSubmit = async(event) => {
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if(!stripe || !elements){
-            return;
+        if (!stripe || !elements) {
+            return
         }
 
         const card = elements.getElement(CardElement);
-        if(card === null){
-            return;
+        if (card === null) {
+            return
         }
 
-        const {error} = await stripe.createPaymentMethod({
+        const { error } = await stripe.createPaymentMethod({
             type: 'card',
-            card,
+            card
         })
 
-        if(error){
-            console.log('error', error);
+        if (error) {
+            console.log('error', error)
             setCardError(error.message);
         }
-        else{
+        else {
             setCardError('');
+            // console.log('payment method', paymentMethod)
         }
 
-        setProcessing(true);
+        setProcessing(true)
 
-        const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(
+        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
             clientSecret,
             {
-              payment_method: {
-                card: card,
-                billing_details: {
-                  email: user?.email || 'unknown',
-                  name: user?.displayName || 'anonymous'
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        email: user?.email || 'unknown',
+                        name: user?.displayName || 'anonymous'
+                    },
                 },
-              },
             },
-          );
+        );
 
-          if(confirmError){
+        if (confirmError) {
             console.log(confirmError);
-          }
+        }
 
-          setProcessing(false);
-          if(paymentIntent.status === 'succeeded'){
-            setTransactionId(paymentIntent.id)
-
+        console.log('payment intent', paymentIntent)
+        setProcessing(false)
+        if (paymentIntent.status === 'succeeded') {
+            setTransactionId(paymentIntent.id);
             // save payment information to the server
-            const payment ={
+            const payment = {
                 email: user?.email,
                 transactionId: paymentIntent.id,
                 price,
+                date: new Date(),
                 quantity: cart.length,
-                items: cart.map(item => item._id),
-                itemName: cart.map(item => item.name)
+                cartItems: cart.map(item => item._id),
+                menuItems: cart.map(item => item.menuItemId),
+                status: 'service pending',
+                itemNames: cart.map(item => item.name)
             }
             axiosSecure.post('/payments', payment)
-            .then(res => {
-                console.log(res.data.insertedId)
-                if(res.data.insertedId){
-                    // display confirm
-                }
-            })
+                .then(res => {
+                    console.log(res.data);
+                    
+                })
+        }
 
-          }
 
     }
     return (
